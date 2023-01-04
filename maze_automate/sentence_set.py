@@ -38,7 +38,10 @@ class Sentence:
             hidden, self.probs[self.labels[i + 1]] = model.update(hidden, self.words[i])
 
     def do_surprisal(self, model):
-        """Get surprisals of words in sentence"""
+        """Get surprisals of words in sentence
+        GT note: does not get the surprisal of the very first word (as we start from index 1) and we are not interested in
+        getting a distractor for the very first word anyway.
+        """
         for i in range(1, len(self.labels)):  # zeroeth position doesn't count
             lab = self.labels[i]
             self.surprisal[lab] = model.get_surprisal(self.probs[lab], self.words[i])
@@ -54,6 +57,7 @@ class Label:
         self.probs = []
         self.surprisals = []
         self.surprisal_targets = []
+        self.surprisals_distractors = []
 
     def add_sentence(self, word, probs, surprisal):
         """Given a position that belongs in the label, add it's attributes to our lists"""
@@ -66,7 +70,7 @@ class Label:
         Find a distractor not on banned (banned=already used in same sentence set)
         That hopefully meets threshold"""
         for surprisal in self.surprisals:  # calculate desired surprisal thresholds
-            self.surprisal_targets.append(max(params["min_abs"], surprisal + params["min_delta"]))
+            self.surprisal_targets.append(max(params["min_abs"], surprisal + params["min_delta"])) # if min_delta is 10, and surprisal is 19, then the last bit is 19, but if min_abs is 25, then we will try to search for 25
         # get us some distractor candidates
         min_length, max_length, min_freq, max_freq = threshold_func(self.words)
         distractor_opts = dict.get_potential_distractors(min_length, max_length, min_freq, max_freq, params)
@@ -81,12 +85,13 @@ class Label:
                 good = True
                 min_surp = 100
                 for i in range(len(self.probs)):  # check distractor candidate against each sentence's probs
-                    dist_surp = model.get_surprisal(self.probs[i], dist)
-                    if dist_surp < self.surprisal_targets[i]:
+                    dist_surp = model.get_surprisal(self.probs[i], dist) # the surprisal of the distractor
+                    if dist_surp < self.surprisal_targets[i]: # which target we are trying to hit
                         good = False  # it doesn't meet the target
                         min_surp = min(min_surp, dist_surp)  # but we should keep track of the lowest anyway
                 if good:  # stayed above all surprisal thresholds
-                    self.distractor = dist  # we're done, yay!
+                    self.distractor = dist  # we're done, yay! # dist_surp should be the surprisal of the distractor
+                    self.surprisals_distractors.append(dist_surp)
                     return self.distractor
                 if min_surp > best_min_surp:  # best so far
                     best_min_surp = min_surp
@@ -94,7 +99,8 @@ class Label:
         logging.warning("Could not find a word to meet threshold for item %s, label %s, returning %s with %d min surp instead",
             self.id, self.lab, best_word, best_min_surp)
         self.distractor = best_word
-        return self.distractor
+        self.surprisals_distractors.append(best_min_surp)
+        return self.distractor # best_min_surp should be the surprisal of the distractor
 
 
 class Sentence_Set:
