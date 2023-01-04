@@ -31,8 +31,8 @@ def run_stuff(infile, outfile, parameters="params.txt", outformat="delim"):
         ss.do_surprisals(m)
         ss.make_labels()
         ss.do_distractors(m, d, threshold_func, params, repeats)
-        print(repeats.distractors)
-        print(repeats.banned)
+        print(f'Distractors fonud: {repeats.distractors}')
+        print(f'Banned distractors: {repeats.banned}')
         ss.clean_up()
     if outformat == "delim":
         save_delim(outfile, sents)

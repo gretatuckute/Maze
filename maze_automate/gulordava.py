@@ -58,4 +58,5 @@ class gulordava_model(lang_model):
         if word_tokens[0] not in self.dictionary.word2idx:
             logging.info('Word %s has unknown first token %s.', word, word_tokens[0])
             return 0  # use 0 as an error code
+        # print(f'Word: {word}, token: {token}, surprisals: {surprisals}')
         return surprisals[token].item()  # numeric value of word's surprisal

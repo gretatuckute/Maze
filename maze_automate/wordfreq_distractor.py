@@ -130,17 +130,22 @@ def get_frequency(word):
 
 
 def get_thresholds(words):
-    """given words, returns min and max length to use"""
+    """given words, returns min and max length to use
+
+    GT note: words will be a list of just one word string, from the original materials
+    """
     lengths = []
     freqs = []
     for word in words:
         stripped = utils.strip_punct(word)
         lengths.append(len(stripped))
         freqs.append(get_frequency(stripped))
+        # print(f"Word: {word} and stripped word: {stripped} with length {len(stripped)} and freq {get_frequency(stripped):.3f}")
     min_length = min(min(lengths), 15)
     max_length = max(max(lengths), 4)
     min_freq = min(min(freqs), 11)
     max_freq = max(max(freqs), 3)
+    print(f'Min length: {min_length}, Max length: {max_length}, Min freq: {min_freq:.3f}, Max freq: {max_freq:.3f}')
     return min_length, max_length, min_freq, max_freq
 
-#
+

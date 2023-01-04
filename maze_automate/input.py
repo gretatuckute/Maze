@@ -37,5 +37,5 @@ def read_input(filename):
                 labels = list(range(0, len(words)))
             if id not in all_sentences.keys():
                 all_sentences[id] = Sentence_Set(id)
-            all_sentences[id].add(Sentence(words, labels, id, tag))
+            all_sentences[id].add(Sentence(words, labels, id, tag)) # Can be accessed as all_sentences['1'].sentences
     return all_sentences
