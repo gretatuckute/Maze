@@ -5,6 +5,7 @@ from limit_repeats import Repeatcounter
 from input import read_input
 from output import save_ibex, save_delim
 import os.path
+import pandas as pd
 
 def run_stuff(infile, outfile, parameters="params.txt", outformat="delim"):
     """Takes an input file, and an output file location
@@ -26,6 +27,7 @@ def run_stuff(infile, outfile, parameters="params.txt", outformat="delim"):
     repeats=Repeatcounter(params.get("max_repeat", 0))
     print(repeats.max)
     print(repeats.limit)
+    storage_dfs = []
     for ss in sents.values():
         ss.do_model(m)
         ss.do_surprisals(m)
@@ -34,7 +36,13 @@ def run_stuff(infile, outfile, parameters="params.txt", outformat="delim"):
         print(f'Distractors fonud: {repeats.distractors}')
         print(f'Banned distractors: {repeats.banned}')
         ss.clean_up()
+        df_ss_storage = ss.package_information_as_df()
+        storage_dfs.append(df_ss_storage)
     if outformat == "delim":
         save_delim(outfile, sents)
     else:
         save_ibex(outfile, sents)
+
+    # Save the storage dfs
+    df_storage = pd.concat(storage_dfs)
+    df_storage.to_csv(outfile.replace(".txt", "_word-level.csv"), index=False)

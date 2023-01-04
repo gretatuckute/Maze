@@ -1,6 +1,7 @@
 import logging
 from utils import copy_punct, strip_punct
 from limit_repeats import Repeatcounter
+import pandas as pd
 
 def no_duplicates(my_list):
     """True if list has no duplicates, else false"""
@@ -25,6 +26,8 @@ class Sentence:
             self.tag = tag  # group/type
             self.distractors = ["x-x-x"]  # we probably shouldn't hard code this in this way, but whatevs
             self.distractor_sentence = ""
+            self.surprisal_distractors = {}
+            self.surprisal_targets = {}
             self.probs = {}  # using a dictionary so we can start at 1 and not 0
             self.surprisal = {}
         else:
@@ -159,6 +162,13 @@ class Sentence_Set:
                 # we match distractors to their real words on punctuation
                 distractor = copy_punct(sentence.words[i], self.labels[lab].distractor)
                 sentence.distractors.append(distractor)
+                assert(len(self.labels[lab].surprisals_distractors) == 1)
+                sentence.surprisal_distractors[lab] = self.labels[lab].surprisals_distractors[0] # there is always just one distractor per label
+                sentence.surprisal_targets[lab] = self.labels[lab].surprisal_targets[0] # there is always just one distractor per label
+                # check that the distractor has higher surprisal than the real word
+                if sentence.surprisal_distractors[lab] < sentence.surprisal[lab]:
+                    logging.warning("Distractor %s has lower surprisal than real word %s in item %s, label %s",
+                        distractor, sentence.words[i], self.id, lab)
             sentence.distractor_sentence = " ".join(sentence.distractors) #and in sentence_format
 
     def clean_up(self):
@@ -166,3 +176,27 @@ class Sentence_Set:
         self.labels = {}
         for sentence in self.sentences:
             sentence.probs = []
+
+    def package_information_as_df(self):
+        """Stores information about the sentence set as a pandas dataframe with one row per word in a sentence."""
+        print(f'Packaging information for sentence with id: {self.id}')
+
+        # Create a dataframe with one row per word in a sentence
+        df = pd.DataFrame({'item_id': self.id,
+                           'tag': self.sentences[0].tag,
+                           'labels': self.sentences[0].labels,
+                           'words': self.sentences[0].words,
+                            'distractors': self.sentences[0].distractors,
+                           'word_sentence': self.sentences[0].word_sentence,
+                            'distractor_sentence': self.sentences[0].distractor_sentence,},
+                          index = self.sentences[0].labels)
+
+        # Other items are labels-1 long, and in dictionaries, so we need to iterate over them:
+        vars_to_iterate = ['surprisal', 'surprisal_distractors', 'surprisal_targets']
+        for var in vars_to_iterate:
+            for label in self.sentences[0].labels[1:]:
+                df.loc[label, var] = getattr(self.sentences[0], var)[label]
+
+        return df
+
+
