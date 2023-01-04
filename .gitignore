@@ -134,3 +134,4 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+maze_automate/gulordava_data/hidden650_batch128_dropout0.2_lr20.0.pt
