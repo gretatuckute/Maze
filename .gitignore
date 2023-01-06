@@ -4,8 +4,8 @@
 *.DS_Store
 .idea
 
-maze_automate/input_files/*[.csv,.txt]
-maze_automate/output_files/*[.csv,.txt]
+maze_automate/input_files/**/*[.csv,.txt]
+maze_automate/output_files/**/*[.csv,.txt]
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
