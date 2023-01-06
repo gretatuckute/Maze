@@ -15,7 +15,7 @@ SAVEDIR = os.getcwd()+'/input_files/'
 
 if __name__ == "__main__":
     save = True
-    generate_punc_test = True # generate a test set with/without punctuation
+    generate_punc_test = False # generate a test set with/without punctuation
 
     #### LOAD THE ORIGINAL STIMSET ####
     fname_stimset = 'beta-control-neural_stimset_D-S_light'

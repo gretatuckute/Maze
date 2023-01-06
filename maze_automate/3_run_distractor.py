@@ -13,7 +13,7 @@ OUTPUTDIR = os.getcwd()+'/output_files/'
 if __name__ == "__main__":
     save = True
 
-    input_fname = "beta-control-neural_stimset_D-S_light_truncated-no-punc"
+    input_fname = "beta-control-neural_stimset_D-S_light"
 
     # Run the distract.py script from the command line
     # os.system(f'python3 distract.py {INPUTDIR}/{input_fname}.txt {OUTPUTDIR}/{input_fname}_output.txt')
