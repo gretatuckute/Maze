@@ -45,4 +45,4 @@ def run_stuff(infile, outfile, parameters="params.txt", outformat="delim"):
 
     # Save the storage dfs
     df_storage = pd.concat(storage_dfs)
-    df_storage.to_csv(outfile.replace(".txt", "_word-level.csv"), index=False)
+    df_storage.to_csv(outfile.replace(".txt", "_word-level3-sample300.csv"), index=False)
